@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<!-- saved from url=(0053)https://www.fdongl.cn/windows/html/windows/snake.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title></title>
+	
+    <link href="./universe.css" rel="stylesheet">
+</head>
+<body>
+    <h1>
+        贪吃蛇源码
+    </h1>
+    <div id="code" style="height:500px;overflow:scroll;width:100%;">
+        <p><span class="high">#include<windows.h>//Windows程序最基本的头文件</windows.h></span></p>
+        <p><span class="high"> </span></p>
+        <p><span class="high">#define IDT_TIMER1 1//定时器ID</span></p>
+        <p><span class="high"></span></p>
+        <p><span class="high">POINT points[200];//蛇身</span></p>
+        <p><span class="high">int pStart, pEnd;//蛇头下标，蛇尾下标</span></p>
+        <p><span class="high"></span></p>
+        <p><span class="high">POINT food;//食物位置</span></p>
+        <p><span class="high"></span></p>
+        <p><span class="high">int dir=0;//当前方向</span></p>
+        <p><span class="high">int gameover=0;//游戏是否结束</span></p>
+        <p><span class="high">int dirs[][2] = { -1,0,1,0,0,1,0,-1 };</span></p>
+        <p><span class="high"></span></p>
+        <p><span class="high">void randFood() {</span></p>
+        <p><span class="high"> int map[10][10] = { 0 };//标识蛇占据了哪些点</span></p>
+        <p><span class="high"> for (int i = pEnd;; i++) {</span></p>
+        <p><span class="high"> if (i &gt;= 200)i = 0;</span></p>
+        <p><span class="high"> map[points[i].x][points[i].y] = 1;</span></p>
+        <p><span class="high"> if (pStart == i)break;</span></p>
+        <p><span class="high"> }</span></p>
+        <p><span class="high"> while (1) {</span></p>
+        <p><span class="high"> food.x = rand() % 10;</span></p>
+        <p><span class="high"> food.y = rand() % 10;</span></p>
+        <p><span class="high"> if (!map[food.x][food.y])break;//判重</span></p>
+        <p><span class="high"> }</span></p>
+        <p><span class="high">}</span></p>
+        <p><span class="high">void InitGame(HWND hWnd) {</span></p>
+        <p><span class="high"> srand(timeGetTime());//随机种子</span></p>
+        <p><span class="high"> dir = rand()%4;//初始方向</span></p>
+        <p><span class="high"> pStart = pEnd = 0;</span></p>
+        <p><span class="high"> points[0] = { 5,5 };//初始点</span></p>
+        <p><span class="high"> gameover = 0;//游戏未结束</span></p>
+        <p><span class="high"> randFood();</span></p>
+        <p><span class="high"> SetTimer(hWnd, IDT_TIMER1, 500, 0);</span></p>
+        <p><span class="high">}</span></p>
+        <p><span class="high"></span></p>
+        <p><span class="high">void GameOver(HWND hWnd) {</span></p>
+        <p><span class="high"> gameover = 1;</span></p>
+        <p><span class="high"> KillTimer(hWnd, IDT_TIMER1);</span></p>
+        <p><span class="high"> MessageBox(0, L"GameOver", 0, 0);</span></p>
+        <p><span class="high">}</span></p>
+        <p><span class="high">LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {</span></p>
+        <p><span class="high"> switch (msg) {</span></p>
+        <p><span class="high"> case WM_CREATE:</span></p>
+        <p><span class="high"> InitGame(hWnd);//开始游戏</span></p>
+        <p><span class="high"> return 0;</span></p>
+        <p><span class="high"> case WM_KEYDOWN:</span></p>
+        <p><span class="high"> switch (wp) {</span></p>
+        <p><span class="high"> case VK_RETURN://重新开始</span></p>
+        <p><span class="high"> InitGame(hWnd);</span></p>
+        <p><span class="high"> break;</span></p>
+        <p><span class="high"> case VK_LEFT:</span></p>
+        <p><span class="high"> dir = 0;</span></p>
+        <p><span class="high"> break;</span></p>
+        <p><span class="high"> case VK_RIGHT:</span></p>
+        <p><span class="high"> dir = 1;</span></p>
+        <p><span class="high"> break;</span></p>
+        <p><span class="high"> case VK_DOWN:</span></p>
+        <p><span class="high"> dir = 2;</span></p>
+        <p><span class="high"> break;</span></p>
+        <p><span class="high"> case VK_UP:</span></p>
+        <p><span class="high"> dir = 3;</span></p>
+        <p><span class="high"> break;</span></p>
+        <p><span class="high"> }</span></p>
+        <p><span class="high"> return 0;</span></p>
+        <p><span class="high"> case WM_TIMER:</span></p>
+        <p><span class="high"> {</span></p>
+        <p><span class="high"> //更新蛇</span></p>
+        <p><span class="high"></span></p>
+        <p><span class="high"> if (gameover)return 0;</span></p>
+        <p><span class="high"> int next = pStart &gt;= 200 ? 0 : pStart + 1;</span></p>
+        <p><span class="high"> points[next] = { points[pStart].x + dirs[dir][0],points[pStart].y + dirs[dir][1] };</span></p>
+        <p><span class="high"> pStart = next;</span></p>
+        <p><span class="high"> //出界判定</span></p>
+        <p><span class="high"> if (points[pStart].x &lt; 0 || points[pStart].x&gt;10 || points[pStart].y &lt; 0 || points[pStart].y&gt;10) {</span></p>
+        <p><span class="high"> GameOver(hWnd);</span></p>
+        <p><span class="high"> }</span></p>
+        <p><span class="high"> //吃食物判定</span></p>
+        <p><span class="high"> else if (points[pStart].x == food.x&amp;&amp;points[pStart].y == food.y) {</span></p>
+        <p><span class="high"> randFood();</span></p>
+        <p><span class="high"> }</span></p>
+        <p><span class="high"> else {</span></p>
+        <p><span class="high"> pEnd = pEnd &gt;= 200 ? 0 : pEnd + 1;//蛇尾增位</span></p>
+        <p><span class="high"> int map[10][10] = { 0 };</span></p>
+        <p><span class="high"> for (int i = pEnd;; i++) {</span></p>
+        <p><span class="high"> if (i &gt;= 200)i = 0;</span></p>
+        <p><span class="high"> if (map[points[i].x][points[i].y]) {</span></p>
+        <p><span class="high"> GameOver(hWnd);</span></p>
+        <p><span class="high"> }</span></p>
+        <p><span class="high"> map[points[i].x][points[i].y] = 1;</span></p>
+        <p><span class="high"> if (pStart == i)break;</span></p>
+        <p><span class="high"> }</span></p>
+        <p><span class="high"> }</span></p>
+        <p><span class="high"> InvalidateRect(hWnd, 0, 0);//通知重绘</span></p>
+        <p><span class="high"> }</span></p>
+        <p><span class="high"> return 0;</span></p>
+        <p><span class="high"> case WM_PAINT:</span></p>
+        <p><span class="high"> {</span></p>
+        <p><span class="high"> PAINTSTRUCT ps;</span></p>
+        <p><span class="high"> HDC hdc = BeginPaint(hWnd, &amp;ps);</span></p>
+        <p><span class="high"> //区域为（200，200），10为边长</span></p>
+        <p><span class="high"> RECT wndRect;</span></p>
+        <p><span class="high"> GetWindowRect(hWnd, &amp;wndRect);//获取窗口矩形</span></p>
+        <p><span class="high"> FillRect(hdc, &amp;wndRect, CreateSolidBrush(0xffffff));</span></p>
+        <p><span class="high"> HBRUSH snakeBrush = CreateSolidBrush(0x000000);</span></p>
+        <p><span class="high"> for (int i = pEnd; i != pStart; i++) {</span></p>
+        <p><span class="high"> if (i &gt;= 200)i = 0;</span></p>
+        <p><span class="high"> int x = points[i].x*20;</span></p>
+        <p><span class="high"> int y = points[i].y*20;</span></p>
+        <p><span class="high"> RECT rect = { x,y,x + 20,y + 20 };</span></p>
+        <p><span class="high"> FillRect(hdc, &amp;rect, snakeBrush);</span></p>
+        <p><span class="high"> }</span></p>
+        <p><span class="high"> int x = points[pStart].x * 20;</span></p>
+        <p><span class="high"> int y = points[pStart].y * 20;</span></p>
+        <p><span class="high"> RECT rect = { x,y,x + 20,y + 20 };</span></p>
+        <p><span class="high"> FillRect(hdc, &amp;rect, CreateSolidBrush(RGB(0xff, 0xff, 0)));</span></p>
+        <p><span class="high"> x = food.x * 20;</span></p>
+        <p><span class="high"> y = food.y * 20;</span></p>
+        <p><span class="high"> rect = { x,y,x + 20,y + 20 };</span></p>
+        <p><span class="high"> FillRect(hdc, &amp;rect, CreateSolidBrush(RGB(0xff, 0, 0)));</span></p>
+        <p><span class="high"> EndPaint(hWnd, &amp;ps);</span></p>
+        <p><span class="high"> }</span></p>
+        <p><span class="high"> return 0;</span></p>
+        <p><span class="high"> case WM_DESTROY:</span></p>
+        <p><span class="high"> PostQuitMessage(0);//向消息队列发送WM_QUIT，使GetMessage返回0</span></p>
+        <p><span class="high"> return 0;</span></p>
+        <p><span class="high"> }</span></p>
+        <p><span class="high"> return DefWindowProc(hWnd, msg, wp, lp);//默认的消息处理函数</span></p>
+        <p><span class="high">}</span></p>
+        <p><span class="high">int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int) {</span></p>
+        <p><span class="high"> const WCHAR * CLASSNAME = TEXT("classname");//TEXT</span></p>
+        <p><span class="high"> WNDCLASS wc = { 0 };</span></p>
+        <p><span class="high"> wc.hCursor = LoadCursor(0, IDC_ARROW);//鼠标样式</span></p>
+        <p><span class="high"> wc.hInstance = hInst;</span></p>
+        <p><span class="high"> wc.lpfnWndProc = WndProc;//消息处理函数</span></p>
+        <p><span class="high"> wc.lpszClassName = CLASSNAME;//窗口的类名</span></p>
+        <p><span class="high"> wc.hbrBackground = CreateSolidBrush(0xffaabb);//窗口背景画刷</span></p>
+        <p><span class="high"> if (!RegisterClass(&amp;wc)) {</span></p>
+        <p><span class="high"> MessageBox(0, L"Register Class - FAILED", 0, 0);//弹窗</span></p>
+        <p><span class="high"> }</span></p>
+        <p><span class="high"> //HWND 是窗口句柄</span></p>
+        <p><span class="high"> HWND hWnd = CreateWindow(CLASSNAME, TEXT("WINDOWNAME"),</span></p>
+        <p><span class="high"> WS_OVERLAPPEDWINDOW, 0, 0, 400, 400, 0, 0, hInst, 0);//创建窗口</span></p>
+        <p><span class="high"> </span></p>
+        <p><span class="high"> if (!hWnd) {</span></p>
+        <p><span class="high"> MessageBox(0, L"CreateWindow - FAILED", 0, 0);</span></p>
+        <p><span class="high"> }</span></p>
+        <p><span class="high"> ShowWindow(hWnd, SW_SHOW);//显示窗口</span></p>
+        <p><span class="high"> UpdateWindow(hWnd);//更新窗口</span></p>
+        <p><span class="high"></span></p>
+        <p><span class="high"> MSG msg = { 0 };</span></p>
+        <p><span class="high"> //消息循环</span></p>
+        <p><span class="high"> while (GetMessage(&amp;msg, 0, 0, 0)) {//获取消息队列的消息</span></p>
+        <p><span class="high"> TranslateMessage(&amp;msg);//翻译消息</span></p>
+        <p><span class="high"> DispatchMessage(&amp;msg);//将消息传给对应的处理函数执行</span></p>
+        <p><span class="high"> }</span></p>
+        <p><span class="high"> return 0;</span></p>
+        <p><span class="high">}</span></p>
+
+        </div>
+
+
+</body></html>

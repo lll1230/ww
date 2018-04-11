@@ -1,0 +1,29 @@
+﻿ .hint{
+       color:blue;
+}
+h1{
+       color:#444;
+       text-indent:20px;
+       letter-spacing:3px;
+       font-size:30px;
+}
+.text{  
+       text-indent:20px;
+}
+a{ 
+       color:blue;
+       text-decoration:none;
+}
+.high{
+       color:#8ba96d;
+}
+#overview{
+    list-style:none;
+    margin-left:-10px;
+}
+#overview li{
+    margin:10px 0px 10px 0;
+}
+.note{
+    color:#2e870a;
+}
